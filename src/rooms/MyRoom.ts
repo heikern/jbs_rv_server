@@ -1,20 +1,57 @@
-import { Room, Client } from "colyseus";
-import { MyRoomState } from "./schema/MyRoomState";
+import { Room, Client, AuthContext } from "colyseus";
+import { GameState, StoryMetadata } from "./schema/MyRoomState";
+import { setCurrentHost, 
+         addNewPlayer, 
+         fetchGameMetaData,
+         setStoryMetadata } from "./messageHandlers/messageHandler";
 
-export class MyRoom extends Room<MyRoomState> {
+
+export class MyRoom extends Room<GameState> {
   maxClients = 4;
-  state = new MyRoomState();
+  state = new GameState();
 
   onCreate (options: any) {
-    this.onMessage("type", (client: any, message: any) => {
-      //
-      // handle "type" message
-      //
-    });
+    // this.onMessage("type", (client: any, message: any) => {
+    //   //
+    //   // handle "type" message
+    //   //
+    // });
+  }
+
+  onAuth(client: Client<any, any>, options: any, context: AuthContext) {
+
+    if (this.state.currentHost && this.state.storyMetadata.NumberOfPlayers <= this.clients.length) {
+      client.send("error", { message: "Player limit reached" }); // send message back to client
+      return Error("Player limit reached");
+    }
+
+    if (!this.state.currentHost && !this.state.storyMetadata.Id) {
+      const storyMetadata = fetchGameMetaData(options.storyId);
+      if (!storyMetadata) {
+        return Error("Invalid story id");
+      }
+      setStoryMetadata.call(this, storyMetadata);
+      return true;
+    }
+
+    return true;
+    
   }
 
   onJoin (client: Client, options: any) {
-    console.log(client.sessionId, "joined!");
+
+    //  Add the new player to the state
+    //  The player is not ready by default
+    addNewPlayer.call(this, client, options.playerName);
+    
+    //  Set the current host if there is no current host
+    if (!this.state.currentHost) {
+      setCurrentHost.call(this, client);
+      console.log(client.sessionId, "joined and is now the host!");
+    }else {
+      console.log(client.sessionId, "joined!");
+    }
+
   }
 
   onLeave (client: Client, consented: boolean) {
