@@ -18,5 +18,4 @@ export class GameState extends Schema {
   @type({ map: Player }) players = new Map<string, Player>();
   @type(StoryMetadata) storyMetadata: StoryMetadata = new StoryMetadata();
   
-
 }
