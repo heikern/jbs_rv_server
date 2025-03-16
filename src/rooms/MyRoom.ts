@@ -11,11 +11,14 @@ export class MyRoom extends Room<GameState> {
   state = new GameState();
 
   onCreate (options: any) {
-    // this.onMessage("type", (client: any, message: any) => {
-    //   //
-    //   // handle "type" message
-    //   //
-    // });
+    // add any message handlers here
+    this.onMessage("setColyPlayerName", (client: Client, data:{playerName: string}) => {
+      const sessionId = client.sessionId
+      const player = this.state.players.get(sessionId)
+      if (player){
+        player.playerName = data.playerName
+      }
+    })
   }
 
   onAuth(client: Client<any, any>, options: any, context: AuthContext) {
@@ -62,7 +65,7 @@ export class MyRoom extends Room<GameState> {
     console.log("room disposing...");
   }
 
-  onMessage(client: any, message: any) {
-    // handle message
-  }
+  // onMessage(client: any, message: any) {
+  //   // handle message
+  // }
 }

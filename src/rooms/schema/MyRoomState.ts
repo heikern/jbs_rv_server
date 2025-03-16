@@ -1,9 +1,8 @@
 import { Schema, type } from "@colyseus/schema";
 
 export class Player extends Schema {
-  @type("string") id: string = "";
   @type("string") playerName: string = "";
-  @type("boolean") isReady: boolean = false;
+  @type("string") playerRole: string = "";
 }
 
 export class StoryMetadata extends Schema {
