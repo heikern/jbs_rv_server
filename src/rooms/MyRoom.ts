@@ -13,10 +13,14 @@ export class MyRoom extends Room<GameState> {
   onCreate (options: any) {
     // add any message handlers here
     this.onMessage("setColyPlayerName", (client: Client, data:{playerName: string}) => {
+      console.log("setColyPlayerName command received", data)
       const sessionId = client.sessionId
       const player = this.state.players.get(sessionId)
       if (player){
         player.playerName = data.playerName
+        this.state.players.set(sessionId, player)
+      } else {
+        console.warn(`Player with sessionId ${sessionId} not found.`);
       }
     })
   }

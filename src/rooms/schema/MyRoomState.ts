@@ -1,4 +1,4 @@
-import { Schema, type } from "@colyseus/schema";
+import { Schema, type, MapSchema } from "@colyseus/schema";
 
 export class Player extends Schema {
   @type("string") playerName: string = "";
@@ -14,7 +14,6 @@ export class StoryMetadata extends Schema {
 
 export class GameState extends Schema {
   @type("string") currentHost: string = "";
-  @type({ map: Player }) players = new Map<string, Player>();
+  @type({ map: Player }) players = new MapSchema<Player>();
   @type(StoryMetadata) storyMetadata: StoryMetadata = new StoryMetadata();
-  
 }

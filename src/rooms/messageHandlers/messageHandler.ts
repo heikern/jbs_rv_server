@@ -46,14 +46,8 @@ export function setCurrentHost(this: Room, client: Client) {
 }
 
 export function addNewPlayer(this: Room, client: Client, playerName: string) {
-    if (!playerName) {
-      playerName = generateRandom4LetterWord();
-    }
 
     const newPlayer = new Player();
-    newPlayer.id = client.sessionId;
-    newPlayer.playerName = playerName;
-    newPlayer.isReady = false;
 
   this.state.players.set(client.sessionId, newPlayer);
 }
