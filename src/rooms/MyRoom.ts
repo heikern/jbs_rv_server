@@ -23,9 +23,14 @@ export class MyRoom extends Room<GameState> {
         console.warn(`Player with sessionId ${sessionId} not found.`);
       }
     })
+
+    this.onMessage("setColyNumPlayers", (client: Client, data:{numPlayers: number}) => {
+      console.log("setColyNumPlayers command received", data)
+      this.state.storyMetadata.NumberOfPlayers = data.numPlayers
+    })
   }
 
-  onAuth(client: Client<any, any>, options: any, context: AuthContext) {
+  async onAuth(client: Client<any, any>, options: any, context: AuthContext) {
 
     if (this.state.currentHost && this.state.storyMetadata.NumberOfPlayers <= this.clients.length) {
       client.send("error", { message: "Player limit reached" }); // send message back to client
@@ -33,11 +38,12 @@ export class MyRoom extends Room<GameState> {
     }
 
     if (!this.state.currentHost && !this.state.storyMetadata.Id) {
-      const storyMetadata = fetchGameMetaData(options.storyId);
+      const storyMetadata = await fetchGameMetaData(options.storyId);
       if (!storyMetadata) {
         return Error("Invalid story id");
       }
       setStoryMetadata.call(this, storyMetadata);
+      console.log("this.state.storyMetadata.Title", this.state.storyMetadata.Title);
       return true;
     }
 
