@@ -8,3 +8,9 @@ build/
 .idea/
 .vscode/
 secret_keys/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
