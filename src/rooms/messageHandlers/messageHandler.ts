@@ -7,7 +7,7 @@ export async function fetchGameMetaData(storyId:string) {
     throw new Error("Provided storyId must be a non-empty string.");
   }
   try {
-    const snapshot = firestoreDb.collection("adventures").doc(storyId);
+    const snapshot = firestoreDb.collection("stories").doc(storyId);
     const doc = await snapshot.get();
     if (!doc.exists) {
       console.log("No such document!");
@@ -24,6 +24,7 @@ export async function fetchGameMetaData(storyId:string) {
 
 export function setStoryMetadata(this: Room, firebaseStoryMetadata: any) {
   if (firebaseStoryMetadata) {
+    console.log("firebaseStoryMetadata", firebaseStoryMetadata);
     this.state.storyMetadata.Id = firebaseStoryMetadata.id;
     this.state.storyMetadata.Title = firebaseStoryMetadata.title;
     this.state.storyMetadata.Description = firebaseStoryMetadata.description;

@@ -39,6 +39,7 @@ export class MyRoom extends Room<GameState> {
 
     if (!this.state.currentHost && !this.state.storyMetadata.Id) {
       const storyMetadata = await fetchGameMetaData(options.storyId);
+      console.log("storyMetadata from firebase raw", storyMetadata);
       if (!storyMetadata) {
         return Error("Invalid story id");
       }
@@ -68,6 +69,7 @@ export class MyRoom extends Room<GameState> {
   }
 
   onLeave (client: Client, consented: boolean) {
+    this.state.players.delete(client.sessionId);
     console.log(client.sessionId, "left!");
   }
 
