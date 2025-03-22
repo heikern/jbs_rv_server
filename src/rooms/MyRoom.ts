@@ -31,6 +31,10 @@ export class MyRoom extends Room<GameState> {
   }
 
   async onAuth(client: Client<any, any>, options: any, context: AuthContext) {
+    const isReconnection = this.state.players.has(client.sessionId);
+    if (isReconnection) {
+      console.log(client.sessionId, "rejoined!");
+    }
 
     if (this.state.currentHost && this.state.storyMetadata.NumberOfPlayers <= this.clients.length) {
       client.send("error", { message: "Player limit reached" }); // send message back to client
@@ -39,7 +43,6 @@ export class MyRoom extends Room<GameState> {
 
     if (!this.state.currentHost && !this.state.storyMetadata.Id) {
       const storyMetadata = await fetchGameMetaData(options.storyId);
-      console.log("storyMetadata from firebase raw", storyMetadata);
       if (!storyMetadata) {
         return Error("Invalid story id");
       }
@@ -68,8 +71,18 @@ export class MyRoom extends Room<GameState> {
 
   }
 
-  onLeave (client: Client, consented: boolean) {
-    this.state.players.delete(client.sessionId);
+  async onLeave (client: Client, consented: boolean) {
+    if (consented){
+      this.state.players.delete(client.sessionId);
+    } else {
+      try {
+        await this.allowReconnection(client, 10000);
+      } catch (e) {
+        this.state.players.delete(client.sessionId);
+      }
+    }
+    
+
     console.log(client.sessionId, "left!");
   }
 

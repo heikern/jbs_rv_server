@@ -24,7 +24,6 @@ export async function fetchGameMetaData(storyId:string) {
 
 export function setStoryMetadata(this: Room, firebaseStoryMetadata: any) {
   if (firebaseStoryMetadata) {
-    console.log("firebaseStoryMetadata", firebaseStoryMetadata);
     this.state.storyMetadata.Id = firebaseStoryMetadata.id;
     this.state.storyMetadata.Title = firebaseStoryMetadata.title;
     this.state.storyMetadata.Description = firebaseStoryMetadata.description;
