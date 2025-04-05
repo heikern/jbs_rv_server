@@ -3,7 +3,9 @@ import { GameState, StoryMetadata } from "./schema/MyRoomState";
 import { setCurrentHost, 
          addNewPlayer, 
          fetchGameMetaData,
-         setStoryMetadata } from "./messageHandlers/messageHandler";
+         setStoryMetadata,
+         setRandomRole } from "./roomController/gameRoomManager";
+import { registerMessageHandlers } from "./roomController/messageHandler";
 
 
 export class MyRoom extends Room<GameState> {
@@ -12,22 +14,7 @@ export class MyRoom extends Room<GameState> {
 
   onCreate (options: any) {
     // add any message handlers here
-    this.onMessage("setColyPlayerName", (client: Client, data:{playerName: string}) => {
-      console.log("setColyPlayerName command received", data)
-      const sessionId = client.sessionId
-      const player = this.state.players.get(sessionId)
-      if (player){
-        player.playerName = data.playerName
-        this.state.players.set(sessionId, player)
-      } else {
-        console.warn(`Player with sessionId ${sessionId} not found.`);
-      }
-    })
-
-    this.onMessage("setColyNumPlayers", (client: Client, data:{numPlayers: number}) => {
-      console.log("setColyNumPlayers command received", data)
-      this.state.storyMetadata.NumberOfPlayers = data.numPlayers
-    })
+    registerMessageHandlers(this);
   }
 
   async onAuth(client: Client<any, any>, options: any, context: AuthContext) {
@@ -76,7 +63,7 @@ export class MyRoom extends Room<GameState> {
       this.state.players.delete(client.sessionId);
     } else {
       try {
-        await this.allowReconnection(client, 10000);
+        await this.allowReconnection(client, 10);
       } catch (e) {
         this.state.players.delete(client.sessionId);
       }
