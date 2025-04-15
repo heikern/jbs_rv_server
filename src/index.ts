@@ -1,17 +1,39 @@
-/**
- * IMPORTANT:
- * ---------
- * Do not manually edit this file if you'd like to host your server on Colyseus Cloud
- *
- * If you're self-hosting (without Colyseus Cloud), you can manually
- * instantiate a Colyseus Server as documented here:
- *
- * See: https://docs.colyseus.io/server/api/#constructor-options
- */
-import { listen } from "@colyseus/tools";
+import { createServer } from "http";
+import { monitor } from "@colyseus/monitor";
+import basicAuth from "express-basic-auth";
+import express from "express";
+import { Server } from "colyseus";
+import appConfig from "./app.config";
+import admin from "./firebase/firestore_admin";
 
-// Import Colyseus config
-import app from "./app.config";
+const app = express();
 
-// Create and listen on 2567 (or PORT environment variable.)
-listen(app);
+const basicAuthMiddleware = basicAuth({
+    users: {admin: "admin"},
+    challenge: true,
+})
+
+// 🖥️ Add monitor panel *after* Express app is configured
+app.use("/colyseus", basicAuthMiddleware, monitor());
+
+appConfig.initializeExpress(app);
+
+const httpServer = createServer(app);
+
+// Manually instantiate the Colyseus server with keep-alive settings
+const gameServer = new Server({
+  server: httpServer,
+  pingInterval: 30000, // Ping every 30 seconds
+//   pingTimeout: 60000   // Disconnect if no pong is received in 60 seconds
+});
+
+appConfig.initializeGameServer(gameServer);
+
+if (appConfig.beforeListen) {
+  appConfig.beforeListen();
+}
+
+const port = process.env.PORT || 2567;
+httpServer.listen(port, () => {
+  console.log(`Server is listening on http://localhost:${port}`);
+});

@@ -9,9 +9,12 @@ enum GameStateEnum {
 };
 
 export class Player extends Schema {
+  @type("string") playerToken: string = "";
   @type("string") playerName: string = "";
+  @type("string") sessionId: string = "";
   @type("string") playerRole: string = "";
   @type("boolean") isReady: boolean = false;
+  @type("boolean") isConnected: boolean = true;
 }
 
 export class StoryMetadata extends Schema {
@@ -22,8 +25,8 @@ export class StoryMetadata extends Schema {
 }
 
 export class GameState extends Schema {
-  @type("string") currentHost: string = "";
+  @type("string") currentHostToken: string = "";
   @type("string") gameState: GameStateEnum = GameStateEnum.StorySelection;
-  @type({ map: Player }) players = new MapSchema<Player>();
+  @type({map: Player}) playersByToken = new MapSchema<Player>();
   @type(StoryMetadata) storyMetadata: StoryMetadata = new StoryMetadata();
 }

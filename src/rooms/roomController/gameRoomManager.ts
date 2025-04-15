@@ -22,7 +22,7 @@ export async function fetchGameMetaData(storyId:string) {
   }
 }
 
-export async function fetchPublicplayerRoles(this:Room){
+export async function fetchPlayerRoles(this:Room){
   const storyId = this.state.storyMetadata.Id;
   if (!storyId || typeof storyId !== "string" || storyId.trim() === "") {
     throw new Error("Provided storyId must be a non-empty string.");
@@ -35,9 +35,9 @@ export async function fetchPublicplayerRoles(this:Room){
       return null;
     }
     const storyData = docs.data();
-    const publicPlayerScripts = Object.keys(storyData.public.roles || {});
+    const playerRoles = Object.keys(storyData.roles || {});
 
-    return publicPlayerScripts
+    return playerRoles
 
   } catch (error) {
     console.log("Error getting document:", error);
@@ -98,24 +98,32 @@ function shuffle<T>(array: T[]): T[] {
   return newArray;
 }
 
-export function setCurrentHost(this: Room, client: Client) {
-  this.state.currentHost = client.sessionId;
+export function setCurrentHost(this: Room, playerToken: string) {
+  this.state.currentHostToken = playerToken;
 }
 
-export function addNewPlayer(this: Room, client: Client, playerName: string) {
+export function addNewPlayer(this: Room, 
+                              client: Client, 
+                              playerToken: string) {
 
     const newPlayer = new Player();
+    newPlayer.playerToken = playerToken;
+    newPlayer.playerName = "";
+    newPlayer.sessionId = client.sessionId;
+    newPlayer.playerRole = "";
+    newPlayer.isReady = false;
+    newPlayer.isConnected = true;
 
-  this.state.players.set(client.sessionId, newPlayer);
+  this.state.playersByToken.set(playerToken, newPlayer);
 }
 
-export async function setRandomRole(this: Room, client: Client) {
-  if (this.state.currentHost === client.sessionId){
-    const playerRoles = await fetchPublicplayerRoles.call(this);
+export async function setRandomRole(this: Room,  playerToken: string) {
+  if (this.state.currentHost === playerToken){
+    const playerRoles = await fetchPlayerRoles.call(this);
     const shuffledPlayerRoles = shuffle(playerRoles);
     if (shuffledPlayerRoles.length === this.state.storyMetadata.NumberOfPlayers) {
       let i = 0;
-      this.state.players.forEach((player: any) => {
+      this.state.playersByToken.forEach((player: any) => {
         player.playerRole = shuffledPlayerRoles[i];
         i++;
       })

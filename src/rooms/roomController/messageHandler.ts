@@ -3,15 +3,15 @@ import { setRandomRole } from "./gameRoomManager";
 
 export function registerMessageHandlers(room: Room<any>){
 
-  room.onMessage("setColyPlayerName", (client: Client, data:{playerName: string}) => {
+  room.onMessage("setColyPlayerName", (client: Client, data:{playerName: string, playerToken: string}) => {
+    const { playerName, playerToken } = data;
     console.log("setColyPlayerName command received", data)
-    const sessionId = client.sessionId
-    const player = room.state.players.get(sessionId)
+    const player = room.state.playersByToken.get(playerToken)
+    
     if (player){
-      player.playerName = data.playerName
-      room.state.players.set(sessionId, player)
+      player.playerName = playerName
     } else {
-      console.warn(`Player with sessionId ${sessionId} not found.`);
+      console.warn(`Player with playerToken ${playerToken} not found.`);
     }
   })
 
@@ -25,15 +25,15 @@ export function registerMessageHandlers(room: Room<any>){
     setRandomRole.call(room, client)
   })
 
-  room.onMessage("setPlayerIsReady", (client: Client) => {
+  room.onMessage("setPlayerIsReady", (client: Client, data:{isReady: boolean, playerToken: string}) => {
     console.log("setPlayerIsReady command received")
-    const sessionId = client.sessionId
-    const player = room.state.players.get(sessionId)
+    const { isReady, playerToken } = data
+    const player = room.state.playersByToken.get(playerToken)
+
     if (player){
-      player.isReady = true
-      room.state.players.set(sessionId, player)
+      player.isReady = isReady
     } else {
-      console.warn(`Player with sessionId ${sessionId} not found.`);
+      console.warn(`Player with playerToken ${playerToken} not found.`);
     }
   })
 
