@@ -20,9 +20,10 @@ export function registerMessageHandlers(room: Room<any>){
     room.state.storyMetadata.NumberOfPlayers = data.numPlayers
   })
 
-  room.onMessage("setRandomizeRoles", (client: Client) => {
+  room.onMessage("setRandomizeRoles", (client: Client, data:{playerToken: string}) => {
     console.log("setRandomizeRoles command received")
-    setRandomRole.call(room, client)
+    const { playerToken } = data
+    setRandomRole.call(room, playerToken)
   })
 
   room.onMessage("setPlayerIsReady", (client: Client, data:{isReady: boolean, playerToken: string}) => {

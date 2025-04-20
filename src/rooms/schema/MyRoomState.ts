@@ -12,7 +12,7 @@ export class Player extends Schema {
   @type("string") playerToken: string = "";
   @type("string") playerName: string = "";
   @type("string") sessionId: string = "";
-  @type("string") playerRole: string = "";
+  @type("string") playerRoleId: string = "";
   @type("boolean") isReady: boolean = false;
   @type("boolean") isConnected: boolean = true;
 }

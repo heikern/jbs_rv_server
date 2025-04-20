@@ -110,7 +110,7 @@ export function addNewPlayer(this: Room,
     newPlayer.playerToken = playerToken;
     newPlayer.playerName = "";
     newPlayer.sessionId = client.sessionId;
-    newPlayer.playerRole = "";
+    newPlayer.playerRoleId = "";
     newPlayer.isReady = false;
     newPlayer.isConnected = true;
 
@@ -118,16 +118,21 @@ export function addNewPlayer(this: Room,
 }
 
 export async function setRandomRole(this: Room,  playerToken: string) {
-  if (this.state.currentHost === playerToken){
+  console.log("entered setRandomRole function");
+  console.log("this.state.currentHost", this.state.currentHost);
+  console.log("playerToken", playerToken);
+  if (this.state.currentHostToken === playerToken){
     const playerRoles = await fetchPlayerRoles.call(this);
     const shuffledPlayerRoles = shuffle(playerRoles);
     if (shuffledPlayerRoles.length === this.state.storyMetadata.NumberOfPlayers) {
       let i = 0;
       this.state.playersByToken.forEach((player: any) => {
-        player.playerRole = shuffledPlayerRoles[i];
+        player.playerRoleId = shuffledPlayerRoles[i];
         i++;
+        console.log(`player ${player.playerToken} assigned role ${player.playerRoleId}`);
       })
       console.log("Player roles have been randomized.");
+
     } else {
       console.error("Number of player roles does not match the number of players in the game.");
     }

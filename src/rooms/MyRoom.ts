@@ -100,7 +100,6 @@ export class MyRoom extends Room<GameState> {
     }else {
       console.log(client.sessionId, "joined!");
     }
-
   }
 
   async onLeave(client: Client, consented: boolean) {
